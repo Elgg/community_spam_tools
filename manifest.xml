@@ -2,7 +2,7 @@
 <plugin_manifest>
 	<field key="author" value="Core developers" />
 	<field key="version" value="1.7" />
-	<field key="description" value="Elgg community spammer throttle" />
+	<field key="description" value="Tools for dealing with spam on the community site" />
 	<field key="website" value="http://www.elgg.org/" />
 	<field key="copyright" value="(C) Elgg core developers 2011" />
 	<field key="license" value="GNU General Public License version 2" />

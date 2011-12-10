@@ -1,15 +1,15 @@
 <?php
 /**
- * Community spammer throttle
+ * Community spammer tools
  */
 
-register_elgg_event_handler('init', 'system', 'community_throttle_init');
+register_elgg_event_handler('init', 'system', 'community_spam_init');
 
 /**
- * Initialize the throttle plugin
+ * Initialize the spam tools plugin
  */
-function community_throttle_init() {
-	register_elgg_event_handler('create', 'object', 'messages_throttle');
+function community_spam_init() {
+	register_elgg_event_handler('create', 'object', 'community_spam_messages_throttle');
 }
 
 /**
@@ -20,12 +20,12 @@ function community_throttle_init() {
  * @param ElggObject $object
  * @return bool
  */
-function messages_throttle($event, $type, $object) {
+function community_spam_messages_throttle($event, $type, $object) {
 	if ($object->getSubtype() !== 'messages') {
 		return;
 	}
 
-	$msg_limit = get_plugin_setting('msg_limit', 'community_throttle');
+	$msg_limit = get_plugin_setting('msg_limit', 'community_spam_tools');
 	if (!$msg_limit) {
 		return;
 	}

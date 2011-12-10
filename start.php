@@ -9,7 +9,11 @@ register_elgg_event_handler('init', 'system', 'community_spam_init');
  * Initialize the spam tools plugin
  */
 function community_spam_init() {
+	// messages spam
 	register_elgg_event_handler('create', 'object', 'community_spam_messages_throttle');
+
+	// profile spam
+	register_plugin_hook('action', 'profile/edit', 'community_spam_profile_blacklist');
 }
 
 /**
@@ -54,5 +58,25 @@ function community_spam_messages_throttle($event, $type, $object) {
 		$report->save();
 
 		ban_user(get_loggedin_userid(), 'messages throttle');
+	}
+}
+
+/**
+ * Filter profile fields by blacklist
+ */
+function community_spam_profile_blacklist() {
+	$blacklist = get_plugin_setting('profile_blacklist', 'community_spam_tools');
+	$blacklist = explode(",", $blacklist);
+	$blacklist = array_map('trim', $blacklist);
+
+	foreach ($_REQUEST as $key => $value) {
+		if (is_string($value)) {
+			foreach ($blacklist as $word) {
+				if (stripos($value, $word) !== false) {
+					ban_user(get_loggedin_userid(), "used '$word' on profile");
+					return false;
+				}
+			}
+		}
 	}
 }

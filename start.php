@@ -14,6 +14,12 @@ function community_spam_init() {
 
 	// profile spam
 	register_plugin_hook('action', 'profile/edit', 'community_spam_profile_blacklist');
+
+	// registration question for spammers
+	if (strpos($_SERVER['REMOTE_ADDR'], '122.162.') === 0) {
+		elgg_extend_view('register/extend', 'community_spam_tools/question');
+		register_plugin_hook('action', 'register', 'community_spam_registration_catch');
+	}
 }
 
 /**
@@ -79,4 +85,22 @@ function community_spam_profile_blacklist() {
 			}
 		}
 	}
+}
+
+/**
+ * Check the answer to the registration question
+ *
+ * @return void
+ */
+function community_spam_registration_catch() {
+	$question = get_input('question');
+	$names = array('brett', 'evan', 'cash');
+	foreach ($names as $name) {
+		if (stripos($question, $name) !== false) {
+			return;
+		}
+	}
+
+	register_error(elgg_echo('community_spam_tools:error:reject'));
+	forward(REFERER);
 }

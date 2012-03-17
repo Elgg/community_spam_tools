@@ -3,17 +3,17 @@
  * Community spammer tools
  */
 
-register_elgg_event_handler('init', 'system', 'community_spam_init');
+elgg_register_event_handler('init', 'system', 'community_spam_init');
 
 /**
  * Initialize the spam tools plugin
  */
 function community_spam_init() {
 	// messages spam
-	register_elgg_event_handler('create', 'object', 'community_spam_messages_throttle');
+	elgg_register_event_handler('create', 'object', 'community_spam_messages_throttle');
 
 	// profile spam
-	register_plugin_hook('action', 'profile/edit', 'community_spam_profile_blacklist');
+	elgg_register_plugin_hook_handler('action', 'profile/edit', 'community_spam_profile_blacklist');
 }
 
 /**
@@ -29,7 +29,7 @@ function community_spam_messages_throttle($event, $type, $object) {
 		return;
 	}
 
-	$msg_limit = get_plugin_setting('msg_limit', 'community_spam_tools');
+	$msg_limit = elgg_get_plugin_setting('msg_limit', 'community_spam_tools');
 	if (!$msg_limit) {
 		return;
 	}
@@ -42,7 +42,7 @@ function community_spam_messages_throttle($event, $type, $object) {
 		'subtype' => 'messages',
 		'created_time_lower' => time() - (5*60), // 5 minutes
 		'metadata_names' => 'fromId',
-		'metadata_values' => get_loggedin_userid(),
+		'metadata_values' => elgg_get_logged_in_user_guid(),
 		'count' => TRUE,
 	);
 	$num_msgs = elgg_get_entities_from_metadata($params);
@@ -50,14 +50,14 @@ function community_spam_messages_throttle($event, $type, $object) {
 
 		$report = new ElggObject;
 		$report->subtype = "reported_content";
-		$report->owner_guid = get_loggedin_userid();
+		$report->owner_guid = elgg_get_logged_in_user_guid();
 		$report->title = "Private message throttle";
 		$report->address = get_loggedin_user()->getURL();
 		$report->description = "this user exceeded the limit by sending $msg_limit messages in 5 minutes";
 		$report->access_id = ACCESS_PRIVATE;
 		$report->save();
 
-		ban_user(get_loggedin_userid(), 'messages throttle');
+		ban_user(elgg_get_logged_in_user_guid(), 'messages throttle');
 	}
 }
 
@@ -65,7 +65,7 @@ function community_spam_messages_throttle($event, $type, $object) {
  * Filter profile fields by blacklist
  */
 function community_spam_profile_blacklist() {
-	$blacklist = get_plugin_setting('profile_blacklist', 'community_spam_tools');
+	$blacklist = elgg_get_plugin_setting('profile_blacklist', 'community_spam_tools');
 	$blacklist = explode(",", $blacklist);
 	$blacklist = array_map('trim', $blacklist);
 
@@ -73,7 +73,7 @@ function community_spam_profile_blacklist() {
 		if (is_string($value)) {
 			foreach ($blacklist as $word) {
 				if (stripos($value, $word) !== false) {
-					ban_user(get_loggedin_userid(), "used '$word' on profile");
+					ban_user(elgg_get_logged_in_user_guid(), "used '$word' on profile");
 					return false;
 				}
 			}

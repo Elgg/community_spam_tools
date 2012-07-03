@@ -14,6 +14,9 @@ function community_spam_init() {
 
 	// profile spam
 	elgg_register_plugin_hook_handler('action', 'profile/edit', 'community_spam_profile_blacklist');
+
+	// limit access to the add links
+	elgg_register_event_handler('pagesetup', 'system', 'community_spam_remove_add_links');
 }
 
 /**
@@ -77,6 +80,41 @@ function community_spam_profile_blacklist() {
 					return false;
 				}
 			}
+		}
+	}
+}
+
+/**
+ * Is this a new user
+ * @return bool
+ */
+function community_spam_is_new_user() {
+	$user = elgg_get_logged_in_user_entity();
+
+	// 2 days
+	$cutoff = time() - 2 * 24 * 60 * 60;
+	if ($user->getTimeCreated() > $cutoff) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * Remove some add links for new users
+ */
+function community_spam_remove_add_links() {
+	if (elgg_is_logged_in() && community_spam_is_new_user()) {
+
+		elgg_unregister_menu_item('extras', 'bookmark');
+		
+		if (elgg_in_context('bookmarks') || elgg_in_context('pages')) {
+			// remove bookmarklet menu item
+			elgg_unregister_plugin_hook_handler('register', 'menu:page', 'bookmarks_page_menu');
+
+			// remove add buttons
+			$callback = function() { return array(); };
+			elgg_register_plugin_hook_handler('register','menu:title', $callback);
 		}
 	}
 }

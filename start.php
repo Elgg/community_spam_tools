@@ -90,6 +90,10 @@ function community_spam_profile_blacklist() {
  */
 function community_spam_is_new_user() {
 	$user = elgg_get_logged_in_user_entity();
+	if (!$user) {
+		// logged out users are new users I guess
+		return true;
+	}
 
 	// 2 days
 	$cutoff = time() - 2 * 24 * 60 * 60;

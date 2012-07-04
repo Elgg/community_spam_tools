@@ -11,6 +11,7 @@ elgg_register_event_handler('init', 'system', 'community_spam_init');
 function community_spam_init() {
 	// messages spam
 	elgg_register_event_handler('create', 'object', 'community_spam_messages_throttle');
+	elgg_register_event_handler('create', 'object', 'community_spam_messages_filter');
 
 	// profile spam
 	elgg_register_plugin_hook_handler('action', 'profile/edit', 'community_spam_profile_blacklist');
@@ -134,5 +135,27 @@ function community_spam_stop_add() {
 		$spammer->annotate('banned', 1); // this integrates with ban plugin
 		$spammer->ban('tried to post content before allowed');
 		return false;
+	}
+}
+
+/**
+ * Filter based on common spam terms
+ */
+function community_spam_messages_filter($event, $type, $object) {
+	if ($object->getSubtype() !== 'messages') {
+		return;
+	}
+
+	if (community_spam_is_new_user()) {
+		$terms = array('yahoo', 'hotmail', 'miss', 'love', 'email address', 'dear', 'picture', 'profile', 'interest');
+		$count = 0;
+		foreach ($terms as $term) {
+			if (stripos($object->description, $term) !== false) {
+				$count++;
+			}
+		}
+		if ($count > 3) {
+			return false;
+		}
 	}
 }

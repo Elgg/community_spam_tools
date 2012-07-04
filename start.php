@@ -17,6 +17,8 @@ function community_spam_init() {
 
 	// limit access to the add links
 	elgg_register_event_handler('pagesetup', 'system', 'community_spam_remove_add_links');
+	elgg_register_plugin_hook_handler('action', 'bookmarks/save', 'community_spam_stop_add');
+	elgg_register_plugin_hook_handler('action', 'pages/edit', 'community_spam_stop_add');
 }
 
 /**
@@ -120,5 +122,18 @@ function community_spam_remove_add_links() {
 			$callback = function() { return array(); };
 			elgg_register_plugin_hook_handler('register','menu:title', $callback);
 		}
+	}
+}
+
+/**
+ * Catch users trying to hit actions directly
+ */
+function community_spam_stop_add() {
+	if (community_spam_is_new_user()) {
+		// spammer tried to directly hit the action
+		$spammer = elgg_get_logged_in_user_entity();
+		$spammer->annotate('banned', 1); // this integrates with ban plugin
+		$spammer->ban('tried to post content before allowed');
+		return false;
 	}
 }

@@ -34,10 +34,16 @@ function community_spam_messages_throttle($event, $type, $object) {
 		return;
 	}
 
-	$msg_limit = elgg_get_plugin_setting('msg_limit', 'community_spam_tools');
+	if (community_spam_is_new_user()) {
+		$msg_limit = elgg_get_plugin_setting('new_user_msg_limit', 'community_spam_tools');
+	} else {
+		$msg_limit = elgg_get_plugin_setting('msg_limit', 'community_spam_tools');
+	}
+
 	if (!$msg_limit) {
 		return;
 	}
+
 	// two message objects created per message but after they are saved,
 	// both are set to private so we only have access to one later on
 	$msg_limit = $msg_limit + 1;
@@ -48,21 +54,14 @@ function community_spam_messages_throttle($event, $type, $object) {
 		'created_time_lower' => time() - (5*60), // 5 minutes
 		'metadata_names' => 'fromId',
 		'metadata_values' => elgg_get_logged_in_user_guid(),
-		'count' => TRUE,
+		'count' => true,
 	);
 	$num_msgs = elgg_get_entities_from_metadata($params);
 	if ($num_msgs > $msg_limit) {
-
-		$report = new ElggObject;
-		$report->subtype = "reported_content";
-		$report->owner_guid = elgg_get_logged_in_user_guid();
-		$report->title = "Private message throttle";
-		$report->address = get_loggedin_user()->getURL();
-		$report->description = "this user exceeded the limit by sending $msg_limit messages in 5 minutes";
-		$report->access_id = ACCESS_PRIVATE;
-		$report->save();
-
-		ban_user(elgg_get_logged_in_user_guid(), 'messages throttle');
+		$spammer = elgg_get_logged_in_user_entity();
+		$spammer->annotate('banned', 1); // this integrates with ban plugin
+		$spammer->ban("Sent $num_msgs in 5 minutes");
+		return false;
 	}
 }
 

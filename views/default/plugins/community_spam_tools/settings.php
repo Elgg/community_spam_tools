@@ -62,4 +62,22 @@ $body .= elgg_view('input/text', array(
 ));
 $body .= '</div>';
 
+
+$body .= '<div>';
+$body .= '<label>' . elgg_echo('community_spam_tools:user_spam_strtotime') . ':</label>';
+$body .= elgg_view('input/text', array(
+	'name' => 'params[user_spam_strtotime]',
+	'value' => $vars['entity']->user_spam_strtotime,
+));
+$body .= '</div>';
+
+
+$body .= '<div>';
+$body .= '<label>' . elgg_echo('community_spam_tools:user_spam_count') . ':</label>';
+$body .= elgg_view('input/text', array(
+	'name' => 'params[user_spam_count]',
+	'value' => $vars['entity']->user_spam_count,
+));
+$body .= '</div>';
+
 echo elgg_view_module('main', $title, $body);

@@ -63,3 +63,29 @@ function community_spam_river_menu($hook, $type, $return, $params) {
 	
 	return $return;
 }
+
+
+
+function community_spam_reported_spam_menu($hook, $type, $return, $params) {
+	if (!elgg_is_admin_logged_in() || !$params['moderate_spam']) {
+		return $return;
+	}
+	
+	// completely replace the menu
+	$return = array();
+	
+	// delete (requires new action due to it being deactivated)
+	$href = elgg_add_action_tokens_to_url('action/reported_spam/delete?guid=' . $params['entity']->guid);
+	$delete = new ElggMenuItem('delete', elgg_view_icon('delete'), $href);
+	$delete->setLinkClass('elgg-requires-confirmation');
+	
+	// unspam - will unmark this as spam and reactivate it
+	$href = elgg_add_action_tokens_to_url('action/reported_spam/notspam?guid=' . $params['entity']->guid);
+	$unspam = new ElggMenuItem('unspam', elgg_echo('community_spam_tools:notspam'), $href);
+	$unspam->setLinkClass('elgg-requires-confirmation');
+	
+	$return[] = $unspam;
+	$return[] = $delete;
+	
+	return $return;
+}

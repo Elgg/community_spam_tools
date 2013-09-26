@@ -27,10 +27,14 @@ function community_spam_init() {
 	
 	// add spam report buttons to entity menus
 	elgg_register_plugin_hook_handler('register', 'menu:entity', 'community_spam_entity_menu');
+	// run last to create a specific menu for admin
+	elgg_register_plugin_hook_handler('register', 'menu:entity', 'community_spam_reported_spam_menu', 1000);
 	elgg_register_plugin_hook_handler('register', 'menu:river', 'community_spam_river_menu');
 	
 	if (community_spam_is_trusted_user(elgg_get_logged_in_user_entity())) {
 		elgg_register_action('report_spam', dirname(__FILE__) . '/actions/report_spam.php');
+		elgg_register_action('reported_spam/delete', dirname(__FILE__) . '/actions/delete.php', 'admin');
+		elgg_register_action('reported_spam/notspam', dirname(__FILE__) . '/actions/notspam.php', 'admin');
 	}
 }
 

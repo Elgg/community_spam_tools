@@ -10,7 +10,9 @@ elgg_register_event_handler('init', 'system', 'community_spam_init');
  */
 function community_spam_init() {
 	// messages spam
-	elgg_register_event_handler('create', 'object', 'community_spam_messages_throttle');
+	if (!elgg_is_admin_logged_in()) {
+		elgg_register_event_handler('create', 'object', 'community_spam_messages_throttle');
+	}
 	elgg_register_event_handler('create', 'object', 'community_spam_messages_filter');
 
 	// profile spam

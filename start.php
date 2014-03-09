@@ -81,8 +81,22 @@ function community_spam_profile_blacklist() {
 			foreach ($blacklist as $word) {
 				if (stripos($value, $word) !== false) {
 					ban_user(elgg_get_logged_in_user_guid(), "used '$word' on profile");
+					$user->automated_ban = true;
 					return false;
 				}
+			}
+		}
+	}
+
+	// if the email address is a phrase, block
+	$profile_fields = elgg_get_config('profile_fields');
+	foreach ($profile_fields as $name => $type) {
+		if ($type == 'email') {
+			$value = get_input($name);
+			if ($value && substr_count($value, ' ') > 1) {
+				ban_user(elgg_get_logged_in_user_guid(), "Used multiple spaces in email field.");
+				$user->automated_ban = true;
+				return false;
 			}
 		}
 	}

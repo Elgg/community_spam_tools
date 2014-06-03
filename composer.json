@@ -1,0 +1,22 @@
+{
+    "name": "elgg/community_spam_tools",
+    "description": "Tools for dealing with spam on the community site",
+    "type": "elgg-plugin",
+    "keywords": [
+        "elgg",
+        "plugin",
+        "security"
+    ],
+    "homepage": "http://www.elgg.org/",
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "Core developers",
+            "homepage": "http://www.elgg.org/",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "composer/installers": ">=1.0.8"
+    }
+}

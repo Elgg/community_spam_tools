@@ -17,11 +17,15 @@ function community_spam_init() {
 
 	// profile spam
 	elgg_register_plugin_hook_handler('action', 'profile/edit', 'community_spam_profile_blacklist');
+	
+	elgg_register_action('spam_tools/bulk_user_delete', __DIR__ . '/actions/bulk_user_delete.php', 'admin');
 
 	// limit access to the add links
 	elgg_register_event_handler('pagesetup', 'system', 'community_spam_remove_add_links');
 	elgg_register_plugin_hook_handler('action', 'bookmarks/save', 'community_spam_stop_add');
 	elgg_register_plugin_hook_handler('action', 'pages/edit', 'community_spam_stop_add');
+	
+	elgg_register_admin_menu_item('administer', 'bookmarks/audit', 'administer_utilities');
 }
 
 /**
@@ -112,13 +116,30 @@ function community_spam_is_new_user() {
 		// logged out users are new users I guess
 		return true;
 	}
+	
+	if ($user->__spam_tools_has_participated) {
+		return false;
+	}
 
 	// 2 days
 	$cutoff = time() - 2 * 24 * 60 * 60;
 	if ($user->getTimeCreated() > $cutoff) {
 		return true;
 	} else {
-		return false;
+		// lets see if they've participated in general discussion
+		$count = elgg_get_entities(array(
+			'type' => 'object',
+			'subtypes' =>  array('comment', 'groupforumtopic', 'discussion_reply'),
+			'owner_guid' => $user->guid,
+			'count' => true
+		));
+		
+		if ($count > 3) {
+			$user->__spam_tools_has_participated = 1;
+			return false;
+		}
+		
+		return true;
 	}
 }
 

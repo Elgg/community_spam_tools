@@ -32,7 +32,13 @@ $bookmark_id = get_subtype_id('object', 'bookmarks');
 $limit = max(array(50, abs((int) get_input('limit', 50))));
 $offset = abs((int) get_input('offset', 0));
 
-$count = elgg_get_entities(array('type' => 'user', 'count' => true));
+$count = elgg_get_entities(array(
+	'type' => 'user',
+	'wheres' => array(
+		"(SELECT COUNT(pbw.guid) FROM {$dbprefix}entities pbw WHERE pbw.type = 'object' AND pbw.subtype = {$bookmark_id} AND pbw.owner_guid = e.guid) > 0"
+	),
+	'count' => true
+));
 
 $pagination = elgg_view('navigation/pagination', array(
 	'count' => $count,

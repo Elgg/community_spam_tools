@@ -43,9 +43,12 @@ $pagination = elgg_view('navigation/pagination', array(
 $options = array(
         'type' => 'user',
         'selects' => array(
-                "(SELECT COUNT(pc.guid) FROM {$dbprefix}entities pc WHERE pc.type = 'object' AND pc.subtype IN({$discussion_id}, {$reply_id}, {$comment_id}) AND pc.owner_guid = e.guid) AS participation",
-                "(SELECT COUNT(pb.guid) FROM {$dbprefix}entities pb WHERE pb.type = 'object' AND pb.subtype = {$bookmark_id} AND pb.owner_guid = e.guid) AS bookmarks"
+			"(SELECT COUNT(pc.guid) FROM {$dbprefix}entities pc WHERE pc.type = 'object' AND pc.subtype IN({$discussion_id}, {$reply_id}, {$comment_id}) AND pc.owner_guid = e.guid) AS participation",
+			"(SELECT COUNT(pb.guid) FROM {$dbprefix}entities pb WHERE pb.type = 'object' AND pb.subtype = {$bookmark_id} AND pb.owner_guid = e.guid) AS bookmarks"
         ),
+		'wheres' => array(
+			"bookmarks > 0"
+		),
         'order_by' => 'participation ASC, bookmarks DESC',
         'limit' => 5,
         'callback' => false, // keep initial query light

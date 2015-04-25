@@ -47,7 +47,7 @@ $options = array(
 			"(SELECT COUNT(pb.guid) FROM {$dbprefix}entities pb WHERE pb.type = 'object' AND pb.subtype = {$bookmark_id} AND pb.owner_guid = e.guid) AS bookmarks"
         ),
 		'wheres' => array(
-			"bookmarks > 0"
+			"(SELECT COUNT(pbw.guid) FROM {$dbprefix}entities pbw WHERE pbw.type = 'object' AND pbw.subtype = {$bookmark_id} AND pbw.owner_guid = e.guid) > 0"
 		),
         'order_by' => 'participation ASC, bookmarks DESC',
         'limit' => 5,

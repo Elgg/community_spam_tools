@@ -24,7 +24,7 @@
 <?php
 
 $dbprefix = elgg_get_config('dbprefix');
-$discussion_id = get_subtype_id('object', 'groupforumtopic');
+$discussion_id = get_subtype_id('object', 'discussion');
 $reply_id = get_subtype_id('object', 'discussion_reply');
 $comment_id = get_subtype_id('object', 'comment');
 $bookmark_id = get_subtype_id('object', 'bookmarks');

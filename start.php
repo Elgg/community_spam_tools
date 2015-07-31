@@ -129,7 +129,7 @@ function community_spam_is_new_user() {
 		// lets see if they've participated in general discussion
 		$count = elgg_get_entities(array(
 			'type' => 'object',
-			'subtypes' =>  array('comment', 'groupforumtopic', 'discussion_reply'),
+			'subtypes' =>  array('comment', 'discussion', 'discussion_reply'),
 			'owner_guid' => $user->guid,
 			'count' => true
 		));

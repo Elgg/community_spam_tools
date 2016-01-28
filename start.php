@@ -147,18 +147,23 @@ function community_spam_is_new_user() {
  * Remove some add links for new users
  */
 function community_spam_remove_add_links() {
-	if (elgg_is_logged_in() && community_spam_is_new_user()) {
+	if (!elgg_is_logged_in()) {
+		return;
+	}
 
-		elgg_unregister_menu_item('extras', 'bookmark');
+	if (!community_spam_is_new_user()) {
+		return;
+	}
 
-		if (elgg_in_context('bookmarks') || elgg_in_context('pages')) {
-			// remove bookmarklet menu item
-			elgg_unregister_plugin_hook_handler('register', 'menu:page', 'bookmarks_page_menu');
+	elgg_unregister_menu_item('extras', 'bookmark');
 
-			// remove add buttons
-			$callback = function() { return array(); };
-			elgg_register_plugin_hook_handler('register','menu:title', $callback);
-		}
+	if (elgg_in_context('bookmarks') || elgg_in_context('pages')) {
+		// remove bookmarklet menu item
+		elgg_unregister_plugin_hook_handler('register', 'menu:page', 'bookmarks_page_menu');
+
+		// remove add buttons
+		$callback = function() { return array(); };
+		elgg_register_plugin_hook_handler('register','menu:title', $callback);
 	}
 }
 
@@ -183,16 +188,18 @@ function community_spam_messages_filter($event, $type, $object) {
 		return;
 	}
 
-	if (community_spam_is_new_user()) {
-		$terms = array('yahoo', 'hotmail', 'miss', 'love', 'email address', 'dear', 'picture', 'profile', 'interest');
-		$count = 0;
-		foreach ($terms as $term) {
-			if (stripos($object->description, $term) !== false) {
-				$count++;
-			}
+	if (!community_spam_is_new_user()) {
+		return;
+	}
+
+	$terms = array('yahoo', 'hotmail', 'miss', 'love', 'email address', 'dear', 'picture', 'profile', 'interest');
+	$count = 0;
+	foreach ($terms as $term) {
+		if (stripos($object->description, $term) !== false) {
+			$count++;
 		}
-		if ($count > 3) {
-			return false;
-		}
+	}
+	if ($count > 3) {
+		return false;
 	}
 }

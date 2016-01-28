@@ -10,6 +10,7 @@ $english = array(
 	'community_spam_tools:msg_limit' => 'Maximum number of sent messages over 5 minutes',
 	'community_spam_tools:msg_limit:new_user' => 'Maximum number of sent messages for new users',
 	'community_spam_tools:blacklist' => 'Comma-separated list of spam words or phrases',
+	'community_spam_tools:blacklist:desc' => 'All user profile fields and the description field of all content types will be checked for these terms. If two or more terms are found, the user gets banned.',
 );
 
 add_translation('en', $english);

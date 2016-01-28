@@ -13,7 +13,8 @@ function community_spam_init() {
 	if (!elgg_is_admin_logged_in()) {
 		elgg_register_event_handler('create', 'object', 'community_spam_messages_throttle');
 	}
-	elgg_register_event_handler('create', 'object', 'community_spam_messages_filter');
+	elgg_register_event_handler('create', 'object', 'community_spam_content_filter');
+	elgg_register_event_handler('update', 'object', 'community_spam_content_filter');
 
 	// profile spam
 	elgg_register_plugin_hook_handler('action', 'profile/edit', 'community_spam_profile_blacklist');
@@ -181,25 +182,34 @@ function community_spam_stop_add() {
 }
 
 /**
- * Filter based on common spam terms
+ * Filter content based on common spam terms and ban spammers
  */
-function community_spam_messages_filter($event, $type, $object) {
-	if ($object->getSubtype() !== 'messages') {
-		return;
-	}
-
+function community_spam_content_filter($event, $type, $object) {
 	if (!community_spam_is_new_user()) {
 		return;
 	}
 
-	$terms = array('yahoo', 'hotmail', 'miss', 'love', 'email address', 'dear', 'picture', 'profile', 'interest');
-	$count = 0;
-	foreach ($terms as $term) {
+	$blacklist = elgg_get_plugin_setting('profile_blacklist', 'community_spam_tools');
+	$blacklist = explode(",", $blacklist);
+	$blacklist = array_map('trim', $blacklist);
+
+	$terms = array();
+	foreach ($blacklist as $term) {
 		if (stripos($object->description, $term) !== false) {
-			$count++;
+			$terms[] = $term;
 		}
 	}
-	if ($count > 3) {
-		return false;
+
+	if (count($terms) < 2) {
+		// Allow the content to be created
+		return;
 	}
+
+	$spammer = elgg_get_logged_in_user_entity();
+	$spammer->annotate('banned', 1); // this integrates with ban plugin
+
+	$terms = implode(', ', $terms);
+	$spammer->ban("Used the following blacklisted terms: $terms");
+
+	return false;
 }

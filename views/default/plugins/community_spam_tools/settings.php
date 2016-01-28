@@ -32,4 +32,5 @@ echo elgg_view('input/plaintext', array(
 	'name' => 'params[profile_blacklist]',
 	'value' => $blacklist,
 ));
+echo '<span class="elgg-text-help">' . elgg_echo('community_spam_tools:blacklist:desc') . '</span>';
 echo '</div>';

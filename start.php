@@ -17,14 +17,14 @@ function community_spam_init() {
 
 	// profile spam
 	elgg_register_plugin_hook_handler('action', 'profile/edit', 'community_spam_profile_blacklist');
-	
+
 	elgg_register_action('spam_tools/bulk_user_delete', __DIR__ . '/actions/bulk_user_delete.php', 'admin');
 
 	// limit access to the add links
 	elgg_register_event_handler('pagesetup', 'system', 'community_spam_remove_add_links');
 	elgg_register_plugin_hook_handler('action', 'bookmarks/save', 'community_spam_stop_add');
 	elgg_register_plugin_hook_handler('action', 'pages/edit', 'community_spam_stop_add');
-	
+
 	elgg_register_admin_menu_item('administer', 'bookmarks/audit', 'administer_utilities');
 }
 
@@ -116,7 +116,7 @@ function community_spam_is_new_user() {
 		// logged out users are new users I guess
 		return true;
 	}
-	
+
 	if ($user->__spam_tools_has_participated) {
 		return false;
 	}
@@ -133,12 +133,12 @@ function community_spam_is_new_user() {
 			'owner_guid' => $user->guid,
 			'count' => true
 		));
-		
+
 		if ($count > 3) {
 			$user->__spam_tools_has_participated = 1;
 			return false;
 		}
-		
+
 		return true;
 	}
 }
@@ -150,7 +150,7 @@ function community_spam_remove_add_links() {
 	if (elgg_is_logged_in() && community_spam_is_new_user()) {
 
 		elgg_unregister_menu_item('extras', 'bookmark');
-		
+
 		if (elgg_in_context('bookmarks') || elgg_in_context('pages')) {
 			// remove bookmarklet menu item
 			elgg_unregister_plugin_hook_handler('register', 'menu:page', 'bookmarks_page_menu');

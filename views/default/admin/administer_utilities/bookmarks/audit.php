@@ -2,20 +2,20 @@
 	table.bookmarks tr:nth-child(even) {
 		background-color: #DEDEDE;
 	}
-	
+
 	table.bookmarks tr {
 		border-bottom: 1px solid black;
 	}
-	
+
 	table.bookmarks tr:first-child td {
 		font-weight: bold;
 	}
-	
+
 	table.bookmarks td {
 		padding: 5px;
 		font-size: 10px;
 	}
-	
+
 	div.table-wrap {
 		width: 100%;
 		overflow: auto;
@@ -80,7 +80,7 @@ foreach ($results as $result) {
 	if (!$user) {
 		continue; // ??
 	}
-	
+
 	// get most recent bookmarks
 	$options = array(
 		'type' => 'object',
@@ -88,19 +88,19 @@ foreach ($results as $result) {
 		'owner_guid' => $user->guid,
 		'limit' => 5
 	);
-	
+
 	$bookmarks = elgg_get_entities($options);
 	$bookmark_urls = '';
 	$bookmark_tags = '';
 	foreach ($bookmarks as $b) {
 		$bookmark_urls .= '<div>' . elgg_get_excerpt($b->address, 70) . '</div>';
-		
+
 		if ($bookmark_tags && $b->tags) {
 			$bookmark_tags .= ', ';
 		}
 		$bookmark_tags .= implode(', ', (array) $b->tags);
 	}
-	
+
 	$body .= '<tr>';
 	$body .= '<td><input type="checkbox" name="guids[]" value="' . $user->guid . '">';
 	$body .= '<td>' . elgg_view_entity_icon($user, 'small') . $user->username  . '</td>';

@@ -7,12 +7,12 @@
 	<website>http://www.elgg.org/</website>
 	<copyright>(C) Elgg core developers 2011</copyright>
 	<license>GNU Public License version 2</license>
- 
+
 	<!-- All plugins must require either elgg_version or elgg_release. -->
 	<requires>
 		<type>elgg_release</type>
 		<version>1.8</version>
 	</requires>
-	
+
 	<category>security</category>
 </plugin_manifest>
